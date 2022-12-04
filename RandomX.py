@@ -1,4 +1,6 @@
 import random, os
+from colorama import init, Fore
+init(autoreset=True)
 
 list = []
 won = {}
@@ -7,18 +9,19 @@ def main():
     list.clear()
     won.clear()
     clear()
+    
     try:
         RollTimes = int(input("How many times to roll a dice? "))
     except:
         main()
     cm(RollTimes)
 
+
 def cm(RollTimes):
     clear()
     try:
-        todo = input("Times: "+ str(RollTimes) +"""
-Items: """+ str(len(list)) +"""
-    What to do next?
+        print("Times: "+ str(RollTimes) +"\nItems: "+ str(len(list)))
+        todo = input("""What to do next?
     1. Add to list
     2. Show list
     3. Remove from list
@@ -31,13 +34,13 @@ Items: """+ str(len(list)) +"""
         
     if todo == 1:
         addItems(RollTimes)
-    if todo == 2:
+    elif todo == 2:
         showlist(RollTimes)
-    if todo == 3:
+    elif todo == 3:
         removeItems(RollTimes)
-    if todo == 4:
+    elif todo == 4:
         run(RollTimes)
-    if todo == 5:
+    elif todo == 5:
         main()
     
 def run(RollTimes):
@@ -45,7 +48,7 @@ def run(RollTimes):
     print("Times: "+ str(RollTimes) +"\nItems: "+ str(len(list)))
     
     if len(list) <= 1:
-        print("You need more items!")
+        print(Fore.RED+"You need more items!")
         input("\nPress Enter to continue...")
         cm(RollTimes)
     
@@ -57,7 +60,7 @@ def run(RollTimes):
         else:
             won[item] = 1
     rate = (int(max(won.values())) * 100)/int(RollTimes)
-    print("\nWinner: \""+max(won, key=won.get)+"\" with " + "{:.2f}".format(rate) + "%")
+    print(Fore.GREEN+"\nWinner: \""+max(won, key=won.get)+"\" with " + "{:.2f}".format(rate) + "%")
     
     inp = input("""
     1. Show results
@@ -70,7 +73,10 @@ def run(RollTimes):
         print("\nWinner: \""+max(won, key=won.get)+"\" with " + "{:.2f}".format(rate) + "%\n")
         for key, value in won.items():
             won[key] = (int(value) * 100)/int(RollTimes)
-            print(key, ':', "{:.2f}".format(won[key])+"%")
+        x = dict( sorted(won.items(), key=lambda x: x[0].lower()) )
+        for key,value in x.items():
+            print('{} : {:.2f}%'.format(key,value))
+        
         
     input("\nPress Enter to continue...")
     won.clear()
@@ -78,41 +84,39 @@ def run(RollTimes):
         
         
     
-    
 def addItems(RollTimes):
     clear()
-    try:
-        itemCount = input("""How many Items to add?
-    !1. Back
+    while True:
+        addNew = input("""Enter something to add into list(or):
+    Back. to Cancel/Save
 """)
-        if itemCount == "!1":
-            cm(RollTimes)
-        itemCount = int(itemCount)
-        if itemCount <= 0:
-            addItems(RollTimes)
-    except:
-        addItems(RollTimes)
-    while itemCount >= 1:
-        addNew = input("Enter something to add into list:\n")
         if addNew == "":
-            print("Item can't be empty!")
+            clear()
+            print(Fore.RED+"Item can't be empty!\n")
+        elif addNew.lower() == "back":
+            cm(RollTimes)
+            break
+        elif addNew.lower() == "all":
+            clear()
+            print(Fore.RED+"\"All\" is not allowed\n")
         elif addNew in list:
-            print("Item already exist!")
+            clear()
+            print(Fore.YELLOW+"Item already exist!\n")
         else:
-            itemCount += -1
             list.append(str(addNew))
-    print("All items added into list")
-    input("\nPress Enter to continue...")
-    cm(RollTimes)
-  
+            clear()
+            print(Fore.GREEN+"\""+addNew+"\" Added into list\n")
+
+
 def showlist(RollTimes):
     clear()
     if len(list) == 0:
-        print("List is empty")
+        print(Fore.RED+"List is empty")
         input("\nPress Enter to continue...")
         cm(RollTimes)
     else:
-        print(*list, sep=", ")
+        newList = sorted(list)
+        print(*newList, sep=", ")
         input("\nPress Enter to continue...")
         cm(RollTimes)
 
@@ -121,37 +125,45 @@ def removeItems(RollTimes):
     print("Items: "+ str(len(list)))
     while len(list) >= 1:
         itemToR = str(input("""Enter item to remove (or): 
-    !1. To remove everything
-    !2. Back
+    All. To remove everything
+    Back. to Cancel/Save
 """)).lower()
-        if itemToR == "!2":
+        if itemToR.lower() == "back":
             cm(RollTimes)
-        elif itemToR == "!1":
+        elif itemToR.lower() == "all":
             list.clear()
-            print("Everything removed")
+            clear()
+            print(Fore.RED+"Everything removed")
             input("\nPress Enter to continue...")
             cm(RollTimes)
         else:
             if itemToR in list:
                 list.remove(itemToR)
-                print(itemToR+" Removed from list")
-                input("\nPress Enter to continue...")
-                removeItems(RollTimes)
+                clear()
+                print(Fore.RED+"\""+itemToR+"\" Removed from list\n")
+            elif itemToR == "":
+                clear()
+                print(Fore.YELLOW+"Can't be empty!\n")
             else:
-                print("Item not exist!")
+                clear()
+                print(Fore.YELLOW+"Item not exist!\n")
     if len(list) == 0:
-        print("There is nothing to remove")
+        print(Fore.YELLOW + 'There is nothing to remove')
         input("\nPress Enter to continue...")
         cm(RollTimes)
 
 def clear():
     os.system('cls' if os.name=='nt' else 'clear')
-    print("""
+    print(Fore.CYAN+"""
  __                            __               
 |__)_  _  _| _  _ \_/  |_     |  \ _ _ | _| _ _ 
 | \(_|| )(_|(_)|||/ \  |_)\/  |__/| (_||(_|(-|  
                           /                     
 """)
 
+__author__ = "Dralder"
+__version__ = "0.1.1"
+
 if __name__ == '__main__':
     main()
+    
